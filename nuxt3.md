@@ -74,84 +74,133 @@ postcss:{
 
 
 
-## 5、Uni-app使用插槽
+## 5、nuxt3配合element plus配置主题色
 
-在Uni-app中封装组件使用插槽时要注意普通H5的使用和微信小程序是有区别的，微信小程序是通过在标签上使用slot属性，指定插槽名进行使用，**注意使用方式**
+大部分情况下我们需要使用的UI组件库的默认颜色不符合我们自己的主题色，要修改，在nuxt中修改步骤略多，记录一下
 
-如：
-
-```html
-//wx
-<image wx:if="{{a}}" class="w-2d5 h-5 mr-3d5" src="/static/images/mission/goback_icon@2x.png" bindtap="{{b}}" alt="goback" slot="left" />
-
-//vue3
-<template #left v-if="showLeft">
-	<img class="w-2.5 h-5 mr-3.5" src="/static/images/mission/goback_icon@2x.png" @click="navigateBack" alt="goback" />
-</template>
-```
-
-## 6、Uni-app在编译rem到rpx没有考虑比例转换
-
-如果遇到使用tailwindcss的时候，rem单位转换到rpx时有错误，需要单独设置样式，使用px转换
-
-## 7、（2024/6/6）微信小程序暂时不支持vue3.4版本新增的defineModel
-
-到目前为止，defineModel的子父组件的双想绑定不能再微信小程序中使用，需要使用原有的实现逻辑，即通过watch监听传入值props和修改值，当修改值改变时，出发emit，将值返回给父组件，父组件获得子组件的更新数据
-
-```vue
-//vue-v<3.4
-//父组件
-v-model:popupOn="popupOn"
-//子组件
-const emits = defineEmits(['update:popupOn']);
-const popup = ref();
-const popShow = ref(props.popupOn);
-const change = (e) => {
-	popShow.value = e.show;
-};
-watch(
-	() => props.popupOn,
-	() => {
-		popShow.value = props.popupOn;
-	}
-);
-watch(popShow, () => {
-	emits('update:popupOn', popShow.value);
-});
-```
-
-## 7、uniapp在css中引入图片会裂开
-
-目前发现**微信小程序**中，如果在css里引入本地文件，比如设置背景图片，在实际渲染的时候会裂开，要注意
-
-```js
-小程序不支持在 css 中使用本地文件，包括本地的背景图和字体文件。需以 base64 方式方可使用。
-urlToBase64(floder, fileName, format = 'png') {
-	let img = `/static/images/${floder}/${fileName}.${format}`;
-	
-	// #ifdef H5
-	return img;
-	// #endif
-
-	// #ifdef MP-WEIXIN
-	let imgBase64 = wx.getFileSystemManager().readFileSync(img, 'base64');
-	let base64Url = `data:image/png;base64,${imgBase64}`;
-	return base64Url;
-	// #endif
+##### 1、在nuxt.config.ts中配置如下
+```ts
+vite: {
+// 预加载
+    optimizeDeps: {
+        include: ['element-plus'],
+    },
+// 引入修改的主题变量
+    css: {
+        preprocessorOptions: {
+            scss: {
+                additionalData: ' @use "@/assets/element/index.scss" as *;', //全局引入变量
+            },
+        },
+    },
+},
+// 最重要的，引入elementplus，覆盖原本的主题样式
+elementPlus: {
+    importStyle: 'scss',
 },
 ```
+##### 2、创建自己的主题scss文件
+```scss
+// @import "element-plus/theme-chalk/base.css";
 
-## 8、uniapp计算移动设备的顶部和底部安全区，兼容微信小程序
+// // 覆盖 primary 主题色
+// :root{
+//   --el-color-primary: #0cba80 !important;
+// }
+/* 修改方法参考element默认global样式的写法，地址：https://github.com/element-plus/element-plus/blob/dev/packages/theme-chalk/src/common/var.scss */
 
-```css
-头部：margin-top: calc(var(--window-top));
-底部：margin-bottom: calc(var(--window-bottom));
-```
+@use 'sass:map';
+@use 'sass:math';
+$colors: () !default;
+$colors: (
+    '--color-white': #ffffff,
+    '--color-black': #000000,
+    '--color-primary': #f84343,
+    '--color-success': #ff7b7b,
+    '--color-warning': #e5ff00,
+    '--color-danger': #ff0000,
+    '--color-error': #ff0000,
+    '--color-info': #6b6b6b,
+    '--color-bg-1': #fff,
+    '--color-bg-2': #f5f5f5,
+    '--color-text-1': #000,
+    '--color-text-2': #333,
+    '--color-text-3': #666,
+    '--color-top-menu-theme': #0011ff,
+    '--el-menu-active-color': #ffffff,
+    '--color-top-menu-text': #000000a6,
+    '--color-top-menu-title': #ffffff,
+    '--color-top-menu-bg': #014bae,
+    '--color-sub-menu-text': #000000a6,
+    '--color-sub-menu-bg': #000c17,
+    '--color-sub-menu-hover': #103b63,
+    '--color-border': #d4d4d4,
+);
 
-## 9、uniapp的组件uni-popup（弹出框）在微信小程序会滚动穿透
+// 默认主题色
+$primary: map.get($colors, --color-primary);
+$success: map.get($colors, --color-success);
+$warning: map.get($colors, --color-warning);
+$danger: map.get($colors, --color-danger);
+$info: map.get($colors, --color-info);
+// 主背景色
+$bg-main: map.get($colors, --color-bg-1);
+// 次背景色
+$bg-sec: map.get($colors, --color-bg-2);
+// 文字颜色
+$text-1: map.get($colors, --color-text-1);
+$text-2: map.get($colors, --color-text-2);
+$text-3: map.get($colors, --color-text-3);
+// 边框
+$border: map.get($colors, --color-border);
+// 侧边导航宽度
+$base-sidebar-width: 200px;
+// 导航栏高度
+$navbar-height: 60px;
+// 默认菜单主题
+$navbar-theme: map.get($colors, --color-top-menu-theme);
+$base-menu-color: map.get($colors, --color-top-menu-text);
+$base-menu-color-active: map.get($colors, --color-top-menu-active);
+$base-menu-background: map.get($colors, --color-menu-bg);
+$base-logo-title-color: map.get($colors, --color-top-menu-title);
+$base-sub-menu-color: map.get($colors, --color-sub-menu-text);
+$base-sub-menu-background: map.get($colors, --color-sub-menu-bg);
+$base-sub-menu-hover: map.get($colors, --color-sub-menu-hover);
+// 导航栏背景色
+$top-bar-bg: linear-gradient(90deg, #2a65f6, #2879ff, #449cf8);
+// dark
+/* $color-black:map.get($colors, --color-black); */
+// --el-color-primary-dark-2
 
-```css
-//需要在不想滚动的页面第一个子节点设置，设置后可以解决外部滚动穿透问题
-<page-meta :page-style="'overflow:' + (isShowPopup ? 'hidden' : 'visible')"></page-meta>
+// types
+$types: primary, success, warning, danger, error, info;
+$elcolor: '--el-color';
+$color: '--color';
+$modeLight: 'light';
+$modeDark: 'dark';
+:root {
+    // @each $key, $value in $colors {
+    //   #{$key}: $value;
+    // }
+    //替换elementui颜色
+    @each $type in $types {
+        #{$elcolor}-#{$type}: map.get($colors, #{$color}-#{$type});
+        @for $i from 1 through 9 {
+            #{$elcolor}-#{$type}-#{$modeLight}-#{$i}: mix(
+                map.get($colors, --color-white),
+                map.get($colors, #{$color}-#{$type}),
+                math.percentage(math.div($i, 10))
+            );
+        }
+        @for $i from 2 through 1 {
+            #{$elcolor}-#{$type}-#{$modeDark}-#{$i}: mix(
+                map.get($colors, --color-white),
+                map.get($colors, #{$color}-#{$type}),
+                math.percentage(math.div($i, 20))
+            );
+        }
+    }
+}
+
 ```
 
