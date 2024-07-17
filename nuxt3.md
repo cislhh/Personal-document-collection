@@ -217,3 +217,15 @@ npm install sharp
 ```
 
 3、上面两个都弄了，还是不好使，老老实实用el-image吧
+
+## 6、 nuxt3中使用动态组件不渲染问题
+想使用 Vue 的 <component :is="someComputedComponent"> 语法，需要使用 Vue 提供的 resolveComponent 辅助函数
+```vue
+<script setup lang="ts">
+    const MyButton = resolveComponent('MyButton')
+</script>
+
+<template>
+    <component :is="MyButton" />
+</template>
+```
