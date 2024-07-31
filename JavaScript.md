@@ -23,4 +23,21 @@ let s = Symbol(2)
 Object.prototype.toString.call(s)  // "[object Symbol]"
 ```
 
-
+#### 2、Array.indexOf判断对象是否存在
+正确
+```js
+    let obja = {a:1}
+    let arr = [
+        obja,
+        {b:1}
+    ]
+    arr.indexOf(obja) //0
+```
+错误
+```js
+    let arr = [
+        {a:1},
+        {b:1}
+    ]
+    arr.indexOf({a:1}) //-1
+```
