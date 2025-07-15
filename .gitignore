@@ -1,0 +1,29 @@
+# 🔒 私密信息
+my-utils-ts/.npmrc
+
+# 🧰 依赖包文件夹
+my-utils-ts/node_modules/
+
+# 🏗️ 编译后的代码
+my-utils-ts/dist/
+my-utils-ts/build/
+
+# 📦 锁定版本文件
+my-utils-ts/package-lock.json
+my-utils-ts/yarn.lock
+
+# 📁 测试覆盖率等报告
+my-utils-ts/coverage/
+
+# 🧪 测试快照文件
+my-utils-ts/__snapshots__/
+
+# 🐞 日志文件
+my-utils-ts/*.log
+my-utils-ts/logs/
+
+# 🌍 环境变量配置
+my-utils-ts/.env
+my-utils-ts/.env.local
+my-utils-ts/.env.development
+my-utils-ts/.env.production

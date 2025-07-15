@@ -1,0 +1,31 @@
+{
+  "name": "cuiji-utils-ts",
+  "version": "1.0.0",
+  "description": "A TypeScript utility toolkit for project layout, rendering logic, and spatial organization",
+  "main": "dist/index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "\"typescript\"",
+    "\"utils\"",
+    "\"project",
+    "layout\"",
+    "\"tools\"",
+    "\"positioning\""
+  ],
+  "author": "cuiji",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.12",
+    "jest": "^30.0.4",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
